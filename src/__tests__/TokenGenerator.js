@@ -3,19 +3,21 @@ import { JWK, JWS } from "node-jose";
 class TokenGenerator {
   #key;
 
-  async init () {
+  async init() {
     const keystore = JWK.createKeyStore();
     this.#key = await keystore.generate("RSA", 2048, {
       alg: "RS256",
-      use: "sig"
+      use: "sig",
     });
+    console.log(keystore);
   }
 
-  get jwk () {
+  get jwk() {
+    console.log(this.#key);
     return this.#key.toJSON();
   }
 
-  async createSignedJWT (payload) {
+  async createSignedJWT(payload) {
     const payloadJson = JSON.stringify(payload);
     return await JWS.createSign(
       { compact: true, fields: { typ: "jwt" } },
@@ -23,6 +25,10 @@ class TokenGenerator {
     )
       .update(payloadJson)
       .final();
+  }
+
+  async createVerifyJWT(key, token) {
+    return await JWS.createVerify(key).verify(token);
   }
 }
 

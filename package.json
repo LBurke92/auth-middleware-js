@@ -26,6 +26,8 @@
     "minimist": "^1.2.6"
   },
   "dependencies": {
+    "axios": "^0.26.1",
+    "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.5"
   },

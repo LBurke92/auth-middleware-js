@@ -7,19 +7,18 @@ const tokenGenerator = new TokenGenerator();
 const options = {
   issuer: "http://issuer.com",
   audience: "audience",
-  algorithms: "RS256"
+  algorithms: "RS256",
 };
 const currentTime = Math.round(Date.now() / 1000);
 const claims = {
   sub: "foo",
   iss: options.issuer,
   aud: options.audience,
-  exp: currentTime + 10
+  exp: currentTime + 10,
 };
 
 beforeAll(async () => {
   await tokenGenerator.init();
-
   nock(options.issuer)
     .persist()
     .get("/.well-known/jwks.json")
@@ -33,11 +32,12 @@ describe("A request with a valid access token", () => {
     const token = await tokenGenerator.createSignedJWT(claims);
     const req = createRequest({
       headers: {
-        authorizationinfo: token
-      }
+        authorizationinfo: token,
+      },
     });
-
     await authorise(options)(req, res, next);
     expect(req).toHaveProperty("user", claims);
   });
+
+  //TO-DO: Expand on edge cases for testing
 });
