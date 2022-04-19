@@ -43,9 +43,9 @@ describe("A request with a valid access token", () => {
 
 describe("A request with a invalid access token", () => {
   test("should respond with a 401 error", async () => {
+    const token = "invalid";
     const res = createResponse();
     const next = jest.fn();
-    const token = "invalid";
     const req = createRequest({
       headers: {
         authorizationinfo: token,
@@ -56,9 +56,56 @@ describe("A request with a invalid access token", () => {
   });
 });
 
-describe("A request with where the the JWK issuing site is wrong", () => {
+describe("A request with a null access token", () => {
+  test("should respond with a 401 error", async () => {
+    const token = null;
+    const res = createResponse();
+    const next = jest.fn();
+    const req = createRequest({
+      headers: {
+        authorizationinfo: token,
+      },
+    });
+    await authorise(options)(req, res, next);
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("A request where the the JWK issuing site is wrong", () => {
   test("should respond with a 401 error", async () => {
     options.issuer = "http://invalid.com";
+    const res = createResponse();
+    const next = jest.fn();
+    const token = await tokenGenerator.createSignedJWT(claims);
+    const req = createRequest({
+      headers: {
+        authorizationinfo: token,
+      },
+    });
+    await authorise(options)(req, res, next);
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("A request where the the JWK issuing site is null", () => {
+  test("should respond with a 401 error", async () => {
+    options.issuer = null;
+    const res = createResponse();
+    const next = jest.fn();
+    const token = await tokenGenerator.createSignedJWT(claims);
+    const req = createRequest({
+      headers: {
+        authorizationinfo: token,
+      },
+    });
+    await authorise(options)(req, res, next);
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("A request where the token has expired", () => {
+  test("should respond with a 401 error", async () => {
+    claims.exp = currentTime - 10;
     const res = createResponse();
     const next = jest.fn();
     const token = await tokenGenerator.createSignedJWT(claims);
