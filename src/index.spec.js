@@ -37,7 +37,37 @@ describe("A request with a valid access token", () => {
     });
     await authorise(options)(req, res, next);
     expect(req).toHaveProperty("user", claims);
+    expect(res.statusCode).toBe(200);
   });
+});
 
-  //TO-DO: Expand on edge cases for testing
+describe("A request with a invalid access token", () => {
+  test("should respond with a 401 error", async () => {
+    const res = createResponse();
+    const next = jest.fn();
+    const token = "invalid";
+    const req = createRequest({
+      headers: {
+        authorizationinfo: token,
+      },
+    });
+    await authorise(options)(req, res, next);
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("A request with where the the JWK issuing site is wrong", () => {
+  test("should respond with a 401 error", async () => {
+    options.issuer = "http://invalid.com";
+    const res = createResponse();
+    const next = jest.fn();
+    const token = await tokenGenerator.createSignedJWT(claims);
+    const req = createRequest({
+      headers: {
+        authorizationinfo: token,
+      },
+    });
+    await authorise(options)(req, res, next);
+    expect(res.statusCode).toBe(401);
+  });
 });

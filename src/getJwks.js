@@ -7,7 +7,7 @@ const getJwks = async (issuer) => {
       return response.data.keys;
     })
     .catch(function (error) {
-      res.status(400).send(error);
+      res.status(404).send(error);
     });
 };
 

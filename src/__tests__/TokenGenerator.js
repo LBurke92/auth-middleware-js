@@ -9,11 +9,9 @@ class TokenGenerator {
       alg: "RS256",
       use: "sig",
     });
-    console.log(keystore);
   }
 
   get jwk() {
-    console.log(this.#key);
     return this.#key.toJSON();
   }
 
